@@ -1,0 +1,47 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.7
+
+buildscript {
+	dependencies { 
+		classpath "onight.osgi:zpp-gradle:3.0.0"
+		classpath ("org.fok.core:org.fok.core.model:0.0.1")
+		classpath ("net.sf.ehcache:ehcache:2.10.5")
+	}
+}
+
+version = '0.0.1'
+
+project.group='org.fok'
+
+apply plugin: 'zippo'
+
+ext {
+    slf4jVersion = '1.7.7'
+    leveldbVersion = '0.7'
+    scastleVersion = '1.53.0.0'
+    springVersion = '4.2.0.RELEASE'
+    hibernateVersion = '4.3.7.Final'
+    junitVersion = '4.11'
+}
+
+dependencies {    
+    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+	compile ("org.fc.zippo:org.fc.zippo.oapi:3.3.2")
+	compile ("org.apache.commons:commons-collections4:4.0")
+	includeInJar ("org.bouncycastle:bcprov-jdk15on:1.58")
+    
+    includeInJar("net.sf.ehcache:ehcache:2.10.5")
+    compile ("org.fok:org.fok.tools:0.0.1")
+    compile ("org.fok.core:org.fok.core.dbapi:0.0.1")
+    compile ("org.fok.core:org.fok.core.model:0.0.1")
+    compile ("org.fok.core:org.fok.core.actuator:0.0.1")
+    compile ("org.fok.core:org.fok.core.api:0.0.1")
+}
+
+jar {
+	manifest{
+		attributes( 'Import-Ignore':'')
+	}
+}
