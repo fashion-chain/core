@@ -23,11 +23,9 @@ import onight.tfw.ntrans.api.annotation.ActorRequire;
 @Instantiate(name = "transaction_da")
 @Slf4j
 public class FokTransactionDataAccess extends BaseDatabaseAccess implements ActorService {
-	@ActorRequire(name = "fok_chain_config", scope = "global")
-	FokChainConfig chainConfig;
-
+	FokChainConfig chainConfig = new FokChainConfig();
 	protected Cache storage;
-	protected final static CacheManager cacheManager = new CacheManager("./conf/ehcache.xml");
+	protected static CacheManager cacheManager = CacheManager.create("./conf/ehcache.xml");
 
 	public FokTransactionDataAccess() {
 		this.storage = new Cache("pendingqueue_" + chainConfig.getTransaction_message_queue_cache_nameId(),

@@ -5,8 +5,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
-import org.fok.core.datasource.bdb.FokAccountDao;
-import org.fok.core.datasource.bdb.FokBlockDao;
 import org.fok.core.dbapi.ODBException;
 import org.fok.core.dbapi.ODBSupport;
 import lombok.Data;
@@ -21,6 +19,6 @@ import onight.tfw.ojpa.api.annotations.StoreDAO;
 @Slf4j
 @Data
 public abstract class SecondaryBaseDatabaseAccess extends BaseDatabaseAccess{	
-	@StoreDAO(target = daoProviderId, daoClass = FokBlockDao.class)
+	@StoreDAO(target = daoProviderId, daoClass = FokSecondaryDao.class)
 	ODBSupport<byte[], byte[]> dao;
 }

@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.felix.ipojo.util.Log;
 import org.fok.core.FokTransaction;
 import org.fok.core.api.IAccountHandler;
-import org.fok.core.api.ICryptoHandler;
+import org.fok.core.cryptoapi.ICryptoHandler;
 import org.fok.core.datasource.FokAccountDataAccess;
 import org.fok.core.model.Account.AccountCryptoToken;
 import org.fok.core.model.Account.AccountCryptoValue;

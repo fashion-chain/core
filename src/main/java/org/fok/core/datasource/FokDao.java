@@ -1,13 +1,13 @@
-package org.fok.core.datasource.bdb;
+package org.fok.core.datasource;
 
-import org.brewchain.bcapi.backend.ODBDao;
+import org.fok.core.dbapi.ODBDao;
 
 import onight.tfw.ojpa.api.ServiceSpec;
 import onight.tfw.outils.conf.PropHelper;
 
-public class FokAccountDao extends ODBDao {
+public class FokDao extends ODBDao {
 
-	public FokAccountDao(ServiceSpec serviceSpec) {
+	public FokDao(ServiceSpec serviceSpec) {
 		super(serviceSpec);
 	}
 

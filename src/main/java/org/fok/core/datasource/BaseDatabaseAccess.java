@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
-import org.fok.core.datasource.bdb.FokAccountDao;
 import org.fok.core.dbapi.ODBException;
 import org.fok.core.dbapi.ODBSupport;
 import org.fok.tools.bytes.BytesHashMap;
@@ -24,7 +23,7 @@ import onight.tfw.ojpa.api.annotations.StoreDAO;
 public abstract class BaseDatabaseAccess implements ActorService {
 	protected static final String daoProviderId = "fok_db";
 
-	@StoreDAO(target = daoProviderId, daoClass = FokAccountDao.class)
+	@StoreDAO(target = daoProviderId, daoClass = FokDao.class)
 	ODBSupport<byte[], byte[]> dao;
 
 	protected byte[] get(ODBSupport<byte[], byte[]> dbs, byte[] key)

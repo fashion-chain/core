@@ -28,15 +28,14 @@ import onight.tfw.ntrans.api.annotation.ActorRequire;
 @Instantiate(name = "blockchain_da")
 @Slf4j
 public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess implements ActorService {
-	@ActorRequire(name = "fok_chain_config", scope = "global")
-	FokChainConfig chainConfig;
 	@ActorRequire(name = "fok_block_buffer", scope = "global")
 	BlockMessageBuffer blockMessageBuffer;
 
+	FokChainConfig chainConfig = new FokChainConfig();
 	protected Cache blockHashStorage;
 	// TODO 不需要缓存根据高度查找Block的方法，因为没法判断缓存里是否包含完整的数据
 	// protected Cache blockNumberStorage;
-	protected final static CacheManager cacheManager = new CacheManager("./conf/ehcache.xml");
+	protected static CacheManager cacheManager = CacheManager.create("./conf/ehcache.xml");
 
 	public FokBlockChainDataAccess() {
 		this.blockHashStorage = new Cache(
@@ -44,15 +43,7 @@ public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess impleme
 				chainConfig.getBlock_message_storage_cache_size(), MemoryStoreEvictionPolicy.LRU, true,
 				"./pendingcache_" + chainConfig.getBlock_message_storage_cache_nameId(), true, 0, 0, true, 120, null);
 		cacheManager.addCache(this.blockHashStorage);
-		// TODO 不需要缓存根据高度查找Block的方法，因为没法判断缓存里是否包含完整的数据
-		// this.blockNumberStorage = new Cache(
-		// "pendingqueue_" + chainConfig.getBlock_message_storage_cache_nameId() +
-		// "_number",
-		// chainConfig.getBlock_message_storage_cache_size(),
-		// MemoryStoreEvictionPolicy.LRU, true,
-		// "./pendingcache_" + chainConfig.getBlock_message_storage_cache_nameId(),
-		// true, 0, 0, true, 120, null);
-		// cacheManager.addCache(this.blockNumberStorage);
+		
 	}
 
 	public void saveBlock(BlockInfo block) throws ODBException, InterruptedException, ExecutionException {
