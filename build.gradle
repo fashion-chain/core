@@ -8,6 +8,9 @@ buildscript {
 		classpath "onight.osgi:zpp-gradle:3.0.0"
 		classpath ("org.fok.core:org.fok.core.model:0.0.1")
 		classpath ("net.sf.ehcache:ehcache:2.10.5")
+		//classpath ("org.fok.core:org.fok.core.actuator:0.0.1")
+		//classpath ("org.fok:org.fok.tools:0.0.1")
+		//classpath ("org.fok.core:org.fok.core.api:0.0.1")
 	}
 }
 
@@ -31,17 +34,17 @@ dependencies {
 	compile ("org.fc.zippo:org.fc.zippo.oapi:3.3.2")
 	compile ("org.apache.commons:commons-collections4:4.0")
 	includeInJar ("org.bouncycastle:bcprov-jdk15on:1.58")
-    
     includeInJar("net.sf.ehcache:ehcache:2.10.5")
     compile ("org.fok:org.fok.tools:0.0.1")
     compile ("org.fok.core:org.fok.core.dbapi:0.0.1")
     compile ("org.fok.core:org.fok.core.model:0.0.1")
     compile ("org.fok.core:org.fok.core.actuator:0.0.1")
     compile ("org.fok.core:org.fok.core.api:0.0.1")
+    compile ("org.fok.core:org.fok.core.cryptoapi:0.0.1")
 }
 
 jar {
 	manifest{
-		attributes( 'Import-Ignore':'')
+		attributes( 'Import-Ignore':'org.bouncycastle,net.sf.ehcache')
 	}
 }
