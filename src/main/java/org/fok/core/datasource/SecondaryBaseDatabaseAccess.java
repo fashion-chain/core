@@ -15,7 +15,7 @@ import onight.tfw.ojpa.api.annotations.StoreDAO;
 
 @NActorProvider
 @Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
-@Instantiate(name = "Fok_DatabaseAccess")
+@Instantiate(name = "fok_secondary_da")
 @Slf4j
 @Data
 public abstract class SecondaryBaseDatabaseAccess extends BaseDatabaseAccess{	

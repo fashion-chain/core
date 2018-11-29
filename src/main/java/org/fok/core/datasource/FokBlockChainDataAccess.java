@@ -10,10 +10,11 @@ import org.fok.core.config.CommonConstant;
 import org.fok.core.config.FokChainConfig;
 import org.fok.core.dbapi.ODBException;
 import org.fok.core.model.Block.BlockInfo;
-import org.fok.core.model.Entity.SecondaryValue;
+import org.fok.core.dbmodel.Entity.SecondaryValue;
 import org.fok.tools.bytes.BytesHashMap;
 import org.fok.tools.bytes.BytesHelper;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -27,7 +28,8 @@ import onight.tfw.ntrans.api.annotation.ActorRequire;
 @Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
 @Instantiate(name = "blockchain_da")
 @Slf4j
-public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess implements ActorService {
+@Data
+public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess {
 	@ActorRequire(name = "fok_block_buffer", scope = "global")
 	BlockMessageBuffer blockMessageBuffer;
 

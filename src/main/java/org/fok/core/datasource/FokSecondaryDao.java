@@ -5,7 +5,7 @@ import org.fok.core.dbapi.ODBDao;
 import onight.tfw.ojpa.api.ServiceSpec;
 import onight.tfw.outils.conf.PropHelper;
 
-public class FokSecondaryDao extends ODBDao {
+public class FokSecondaryDao extends ODBDao<byte[], byte[]> {
 
 	public FokSecondaryDao(ServiceSpec serviceSpec) {
 		super(serviceSpec);

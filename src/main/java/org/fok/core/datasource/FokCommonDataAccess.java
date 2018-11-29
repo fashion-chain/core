@@ -6,13 +6,17 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
+import org.fok.core.bean.BlockMessageBuffer;
 import org.fok.core.config.CommonConstant;
+import org.fok.core.config.FokChainConfig;
 import org.fok.core.dbapi.ODBException;
 import org.fok.core.model.Account.AccountContract;
 import org.fok.core.model.Account.AccountContractValue;
 import org.fok.tools.bytes.BytesComparisons;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.ehcache.Cache;
 import onight.osgi.annotation.NActorProvider;
 import onight.tfw.ntrans.api.ActorService;
 
@@ -20,7 +24,8 @@ import onight.tfw.ntrans.api.ActorService;
 @Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
 @Instantiate(name = "common_da")
 @Slf4j
-public class FokCommonDataAccess extends BaseDatabaseAccess implements ActorService {
+@Data
+public class FokCommonDataAccess extends BaseDatabaseAccess {
 	// @StoreDAO(target = daoProviderId, daoClass = FokAccountDao.class)
 	// ODBSupport<byte[], byte[]> commonDao;
 

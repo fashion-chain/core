@@ -5,10 +5,12 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
+import org.fok.core.bean.BlockMessageBuffer;
 import org.fok.core.config.FokChainConfig;
 import org.fok.core.dbapi.ODBException;
 import org.fok.core.model.Transaction.TransactionInfo;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
@@ -22,15 +24,16 @@ import onight.tfw.ntrans.api.annotation.ActorRequire;
 @Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
 @Instantiate(name = "transaction_da")
 @Slf4j
-public class FokTransactionDataAccess extends BaseDatabaseAccess implements ActorService {
+@Data
+public class FokTransactionDataAccess extends BaseDatabaseAccess {
 	FokChainConfig chainConfig = new FokChainConfig();
 	protected Cache storage;
 	protected static CacheManager cacheManager = CacheManager.create("./conf/ehcache.xml");
 
 	public FokTransactionDataAccess() {
-		this.storage = new Cache("pendingqueue_" + chainConfig.getTransaction_message_queue_cache_nameId(),
-				chainConfig.getTransaction_message_queue_cache_size(), MemoryStoreEvictionPolicy.LRU, true,
-				"./pendingcache_" + chainConfig.getTransaction_message_queue_cache_nameId(), true, 0, 0, true, 120,
+		this.storage = new Cache("pendingqueue_" + chainConfig.getTransaction_message_cache_nameId(),
+				chainConfig.getTransaction_message_cache_size(), MemoryStoreEvictionPolicy.LRU, true,
+				"./pendingcache_" + chainConfig.getTransaction_message_cache_nameId(), true, 0, 0, true, 120,
 				null);
 		cacheManager.addCache(this.storage);
 	}
