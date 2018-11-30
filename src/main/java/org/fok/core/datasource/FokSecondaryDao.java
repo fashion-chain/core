@@ -5,7 +5,7 @@ import org.fok.core.dbapi.ODBDao;
 import onight.tfw.ojpa.api.ServiceSpec;
 import onight.tfw.outils.conf.PropHelper;
 
-public class FokSecondaryDao extends ODBDao<byte[], byte[]> {
+public class FokSecondaryDao extends ODBDao {
 
 	public FokSecondaryDao(ServiceSpec serviceSpec) {
 		super(serviceSpec);
@@ -13,6 +13,6 @@ public class FokSecondaryDao extends ODBDao<byte[], byte[]> {
 
 	@Override
 	public String getDomainName() {
-		return "account.." + new PropHelper(null).get("org.brewchain.account.slicecount", 16);
+		return "sk.x.2";
 	}
 }

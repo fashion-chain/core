@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import onight.oapi.scala.commons.SessionModules;
 import onight.osgi.annotation.NActorProvider;
 import onight.tfw.ntrans.api.ActorService;
+import onight.tfw.ojpa.api.DomainDaoSupport;
 import onight.tfw.ojpa.api.annotations.StoreDAO;
 
 @NActorProvider
@@ -23,6 +24,27 @@ import onight.tfw.ojpa.api.annotations.StoreDAO;
 @Slf4j
 @Data
 public class FokAccountDataAccess extends BaseDatabaseAccess {
+	@StoreDAO(target = daoProviderId, daoClass = FokDao.class)
+	ODBSupport dao;
+	
+	@Override
+	public String[] getCmds() {
+		return new String[] { "ACTDAO" };
+	}
+	
+	@Override
+	public String getModule() {
+		return "CORE";
+	}
+
+	public void setDao(DomainDaoSupport dao) {
+		this.dao = (ODBSupport) dao;
+	}
+
+	public ODBSupport getDao() {
+		return dao;
+	}
+	
 	public byte[] getAccountFromDb(byte[] address) throws ODBException, InterruptedException, ExecutionException {
 		return get(dao, address);
 	}

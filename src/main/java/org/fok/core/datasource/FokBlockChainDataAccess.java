@@ -9,6 +9,7 @@ import org.fok.core.bean.BlockMessageBuffer;
 import org.fok.core.config.CommonConstant;
 import org.fok.core.config.FokChainConfig;
 import org.fok.core.dbapi.ODBException;
+import org.fok.core.dbapi.ODBSupport;
 import org.fok.core.model.Block.BlockInfo;
 import org.fok.core.dbmodel.Entity.SecondaryValue;
 import org.fok.tools.bytes.BytesHashMap;
@@ -23,16 +24,38 @@ import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 import onight.osgi.annotation.NActorProvider;
 import onight.tfw.ntrans.api.ActorService;
 import onight.tfw.ntrans.api.annotation.ActorRequire;
+import onight.tfw.ojpa.api.DomainDaoSupport;
+import onight.tfw.ojpa.api.annotations.StoreDAO;
 
 @NActorProvider
-@Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
+//@Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
 @Instantiate(name = "blockchain_da")
 @Slf4j
 @Data
 public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess {
 	@ActorRequire(name = "fok_block_buffer", scope = "global")
 	BlockMessageBuffer blockMessageBuffer;
+	@StoreDAO(target = daoProviderId, daoClass = FokSecondaryDao.class)
+	ODBSupport dao;
+	
+	@Override
+	public String[] getCmds() {
+		return new String[] { "BCDAO" };
+	}
+	
+	@Override
+	public String getModule() {
+		return "CORE";
+	}
 
+	public void setDao(DomainDaoSupport dao) {
+		this.dao = (ODBSupport) dao;
+	}
+
+	public ODBSupport getDao() {
+		return dao;
+	}
+	
 	FokChainConfig chainConfig = new FokChainConfig();
 	protected Cache blockHashStorage;
 	// TODO 不需要缓存根据高度查找Block的方法，因为没法判断缓存里是否包含完整的数据

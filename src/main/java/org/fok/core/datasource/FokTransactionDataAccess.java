@@ -8,6 +8,7 @@ import org.apache.felix.ipojo.annotations.Provides;
 import org.fok.core.bean.BlockMessageBuffer;
 import org.fok.core.config.FokChainConfig;
 import org.fok.core.dbapi.ODBException;
+import org.fok.core.dbapi.ODBSupport;
 import org.fok.core.model.Transaction.TransactionInfo;
 
 import lombok.Data;
@@ -19,6 +20,8 @@ import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 import onight.osgi.annotation.NActorProvider;
 import onight.tfw.ntrans.api.ActorService;
 import onight.tfw.ntrans.api.annotation.ActorRequire;
+import onight.tfw.ojpa.api.DomainDaoSupport;
+import onight.tfw.ojpa.api.annotations.StoreDAO;
 
 @NActorProvider
 @Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
@@ -26,10 +29,31 @@ import onight.tfw.ntrans.api.annotation.ActorRequire;
 @Slf4j
 @Data
 public class FokTransactionDataAccess extends BaseDatabaseAccess {
+	@StoreDAO(target = daoProviderId, daoClass = FokDao.class)
+	ODBSupport dao;
+	
 	FokChainConfig chainConfig = new FokChainConfig();
 	protected Cache storage;
 	protected static CacheManager cacheManager = CacheManager.create("./conf/ehcache.xml");
 
+	@Override
+	public String[] getCmds() {
+		return new String[] { "TRXDAO" };
+	}
+	
+	@Override
+	public String getModule() {
+		return "CORE";
+	}
+
+	public void setDao(DomainDaoSupport dao) {
+		this.dao = (ODBSupport) dao;
+	}
+
+	public ODBSupport getDao() {
+		return dao;
+	}
+	
 	public FokTransactionDataAccess() {
 		this.storage = new Cache("pendingqueue_" + chainConfig.getTransaction_message_cache_nameId(),
 				chainConfig.getTransaction_message_cache_size(), MemoryStoreEvictionPolicy.LRU, true,

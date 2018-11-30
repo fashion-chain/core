@@ -10,24 +10,60 @@ import org.fok.core.bean.BlockMessageBuffer;
 import org.fok.core.config.CommonConstant;
 import org.fok.core.config.FokChainConfig;
 import org.fok.core.dbapi.ODBException;
+import org.fok.core.dbapi.ODBSupport;
 import org.fok.core.model.Account.AccountContract;
 import org.fok.core.model.Account.AccountContractValue;
 import org.fok.tools.bytes.BytesComparisons;
 
+import com.google.protobuf.Message;
+
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.ehcache.Cache;
+import onight.oapi.scala.commons.SessionModules;
 import onight.osgi.annotation.NActorProvider;
 import onight.tfw.ntrans.api.ActorService;
+import onight.tfw.ojpa.api.DomainDaoSupport;
+import onight.tfw.ojpa.api.annotations.StoreDAO;
 
 @NActorProvider
-@Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
+// @Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
 @Instantiate(name = "common_da")
 @Slf4j
 @Data
 public class FokCommonDataAccess extends BaseDatabaseAccess {
-	// @StoreDAO(target = daoProviderId, daoClass = FokAccountDao.class)
-	// ODBSupport<byte[], byte[]> commonDao;
+	@StoreDAO(target = daoProviderId, daoClass = FokDao.class)
+	ODBSupport dao;
+
+	@Override
+	public void onDaoServiceAllReady() {
+		log.debug("Common Data Access Ready");
+	}
+
+	@Override
+	public String[] getCmds() {
+		return new String[] { "COMDAO" };
+	}
+
+	@Override
+	public String getModule() {
+		return "CORE";
+	}
+
+	public void setDao(DomainDaoSupport dao) {
+		this.dao = (ODBSupport) dao;
+	}
+
+	public ODBSupport getDao() {
+		return dao;
+	}
+
+	public boolean isReady() {
+		if (dao != null && FokDao.class.isInstance(dao)) {
+			return true;
+		}
+		return false;
+	}
 
 	public byte[] getNodeAccountAddress() throws ODBException, InterruptedException, ExecutionException {
 		return get(dao, CommonConstant.Node_Account_Address);
@@ -49,20 +85,23 @@ public class FokCommonDataAccess extends BaseDatabaseAccess {
 	 * @throws ExecutionException
 	 */
 	public List<AccountContractValue> getContractByCreator(byte[] address) throws Exception {
-		List<AccountContractValue> contracts = new ArrayList<>();
-		AccountContract oAccountContract = null;
-		byte[] v = get(dao, CommonConstant.Exists_Contract);
-		if (v != null) {
-			oAccountContract = AccountContract.parseFrom(v);
-		}
-		if (oAccountContract != null) {
-			for (AccountContractValue oAccountContractValue : oAccountContract.getValueList()) {
-				if (BytesComparisons.equal(address, oAccountContractValue.getAddress().toByteArray())) {
-					contracts.add(oAccountContractValue);
-				}
-			}
-		}
-		return contracts;
+		return null;
+		// List<AccountContractValue> contracts = new ArrayList<>();
+		// AccountContract oAccountContract = null;
+		// byte[] v = get(dao, CommonConstant.Exists_Contract);
+		// if (v != null) {
+		// oAccountContract = AccountContract.parseFrom(v);
+		// }
+		// if (oAccountContract != null) {
+		// for (AccountContractValue oAccountContractValue :
+		// oAccountContract.getValueList()) {
+		// if (BytesComparisons.equal(address,
+		// oAccountContractValue.getAddress().toByteArray())) {
+		// contracts.add(oAccountContractValue);
+		// }
+		// }
+		// }
+		// return contracts;
 	}
 
 	// public List<TokenValue> getToken()
