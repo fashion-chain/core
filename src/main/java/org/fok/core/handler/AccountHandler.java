@@ -3,8 +3,6 @@ package org.fok.core.handler;
 import java.math.BigInteger;
 import java.util.List;
 
-import org.apache.felix.ipojo.util.Log;
-import org.fok.core.FokTransaction;
 import org.fok.core.api.IAccountHandler;
 import org.fok.core.cryptoapi.ICryptoHandler;
 import org.fok.core.datasource.FokAccountDataAccess;
