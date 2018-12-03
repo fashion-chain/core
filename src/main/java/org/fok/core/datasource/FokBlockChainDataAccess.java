@@ -5,9 +5,12 @@ import java.util.concurrent.ExecutionException;
 
 import org.apache.felix.ipojo.annotations.Instantiate;
 import org.apache.felix.ipojo.annotations.Provides;
+import org.apache.felix.ipojo.annotations.Validate;
 import org.fok.core.bean.BlockMessageBuffer;
 import org.fok.core.config.CommonConstant;
 import org.fok.core.config.FokChainConfig;
+import org.fok.core.config.FokChainConfigKeys;
+import org.fok.core.cryptoapi.ICryptoHandler;
 import org.fok.core.dbapi.ODBException;
 import org.fok.core.dbapi.ODBSupport;
 import org.fok.core.model.Block.BlockInfo;
@@ -26,9 +29,9 @@ import onight.tfw.ntrans.api.ActorService;
 import onight.tfw.ntrans.api.annotation.ActorRequire;
 import onight.tfw.ojpa.api.DomainDaoSupport;
 import onight.tfw.ojpa.api.annotations.StoreDAO;
+import onight.tfw.outils.conf.PropHelper;
 
 @NActorProvider
-//@Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
 @Instantiate(name = "blockchain_da")
 @Slf4j
 @Data
@@ -37,15 +40,22 @@ public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess {
 	BlockMessageBuffer blockMessageBuffer;
 	@StoreDAO(target = daoProviderId, daoClass = FokSecondaryDao.class)
 	ODBSupport dao;
+	@ActorRequire(name = "fok_chain_config", scope = "global")
+	FokChainConfig chainConfig;
+	PropHelper prop = new PropHelper(null);
+	@ActorRequire(name = "bc_crypto", scope = "global")
+	ICryptoHandler crypto;
 	
+	@ActorRequire(name = "common_da", scope = "global")
+	FokCommonDataAccess fokCommonDA;
 	@Override
 	public String[] getCmds() {
 		return new String[] { "BCDAO" };
 	}
-	
+
 	@Override
 	public String getModule() {
-		return "CORE";
+		return "CHAIN";
 	}
 
 	public void setDao(DomainDaoSupport dao) {
@@ -55,8 +65,7 @@ public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess {
 	public ODBSupport getDao() {
 		return dao;
 	}
-	
-	FokChainConfig chainConfig = new FokChainConfig();
+
 	protected Cache blockHashStorage;
 	// TODO 不需要缓存根据高度查找Block的方法，因为没法判断缓存里是否包含完整的数据
 	// protected Cache blockNumberStorage;
@@ -64,16 +73,22 @@ public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess {
 
 	public FokBlockChainDataAccess() {
 		this.blockHashStorage = new Cache(
-				"pendingqueue_" + chainConfig.getBlock_message_storage_cache_nameId() + "_hash",
-				chainConfig.getBlock_message_storage_cache_size(), MemoryStoreEvictionPolicy.LRU, true,
-				"./pendingcache_" + chainConfig.getBlock_message_storage_cache_nameId(), true, 0, 0, true, 120, null);
+				"pendingqueue_" + prop.get(FokChainConfigKeys.block_message_storage_cache_nameId_key, "block_cache")
+						+ "_hash",
+				prop.get(FokChainConfigKeys.block_message_storage_cache_size_key, 100), MemoryStoreEvictionPolicy.LRU,
+				true,
+				"./pendingcache_" + prop.get(FokChainConfigKeys.block_message_storage_cache_nameId_key, "block_cache"),
+				true, 0, 0, true, 120, null);
 		cacheManager.addCache(this.blockHashStorage);
-		
 	}
 
 	public void saveBlock(BlockInfo block) throws ODBException, InterruptedException, ExecutionException {
-		put(dao, block.getHeader().getHash().toByteArray(), block.toByteArray());
+		put(dao, block.getHeader().getHash().toByteArray(), BytesHelper.longToBytes(block.getHeader().getHeight()),
+				block.toByteArray());
 		this.blockHashStorage.put(new Element(block.getHeader().getHash().toByteArray(), block));
+
+		log.debug("区块存储   ===>   保存区块。 hash[{}] 高度[{}] ",
+				crypto.bytesToHexStr(block.getHeader().getHash().toByteArray()), block.getHeader().getHeight());
 	}
 
 	public BlockInfo getBlockByHash(byte[] hash) throws Exception {
@@ -101,6 +116,8 @@ public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess {
 			// this.blockNumberStorage.put(e);
 			return block;
 		}
+
+		log.debug("区块存储   ===>   没有找到hash为[{}]的区块。", crypto.bytesToHexStr(hash));
 		return null;
 	}
 
@@ -115,16 +132,24 @@ public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess {
 		return bis;
 	}
 
+	public void connectBlock(BlockInfo block) throws Exception {
+		fokCommonDA.setConnectBlockHash(block.getHeader().getHash().toByteArray());
+	}
+
 	public BlockInfo loadMaxConnectBlock() throws Exception {
-		byte[] v = get(dao, CommonConstant.Max_Connected_Block);
+		byte[] v = fokCommonDA.getConnectBlockHash();
 		if (v != null) {
 			return getBlockByHash(v);
 		}
 		return null;
 	}
 
+	public void stableBlock(BlockInfo block) throws Exception {
+		fokCommonDA.setStableBlockHash(block.getHeader().getHash().toByteArray());
+	}
+
 	public BlockInfo loadMaxStableBlock() throws Exception {
-		byte[] v = get(dao, CommonConstant.Max_Stabled_Block);
+		byte[] v = fokCommonDA.getStableBlockHash();
 		if (v != null) {
 			return getBlockByHash(v);
 		}

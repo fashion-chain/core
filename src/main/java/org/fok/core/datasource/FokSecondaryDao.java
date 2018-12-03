@@ -13,6 +13,6 @@ public class FokSecondaryDao extends ODBDao {
 
 	@Override
 	public String getDomainName() {
-		return "sk.x.2";
+		return "bdb.index";
 	}
 }

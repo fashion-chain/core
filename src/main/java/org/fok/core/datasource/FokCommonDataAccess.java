@@ -73,6 +73,22 @@ public class FokCommonDataAccess extends BaseDatabaseAccess {
 		put(dao, CommonConstant.Node_Account_Address, address);
 	}
 
+	public byte[] getConnectBlockHash() throws ODBException, InterruptedException, ExecutionException {
+		return get(dao, CommonConstant.Max_Connected_Block);
+	}
+
+	public void setConnectBlockHash(byte[] hash) throws ODBException, InterruptedException, ExecutionException {
+		put(dao, CommonConstant.Max_Connected_Block, hash);
+	}
+
+	public byte[] getStableBlockHash() throws ODBException, InterruptedException, ExecutionException {
+		return get(dao, CommonConstant.Max_Stabled_Block);
+	}
+	
+	public void setStableBlockHash(byte[] hash) throws ODBException, InterruptedException, ExecutionException {
+		put(dao, CommonConstant.Max_Stabled_Block, hash);
+	}
+
 	/**
 	 * Return contract info created by creator
 	 * 

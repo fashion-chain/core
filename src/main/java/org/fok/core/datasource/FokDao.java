@@ -13,6 +13,6 @@ public class FokDao extends ODBDao {
 
 	@Override
 	public String getDomainName() {
-		return "bdb..";
+		return "bdb..4";
 	}
 }

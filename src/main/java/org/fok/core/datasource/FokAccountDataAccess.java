@@ -19,7 +19,6 @@ import onight.tfw.ojpa.api.DomainDaoSupport;
 import onight.tfw.ojpa.api.annotations.StoreDAO;
 
 @NActorProvider
-@Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
 @Instantiate(name = "account_da")
 @Slf4j
 @Data
@@ -34,7 +33,7 @@ public class FokAccountDataAccess extends BaseDatabaseAccess {
 	
 	@Override
 	public String getModule() {
-		return "CORE";
+		return "CHAIN";
 	}
 
 	public void setDao(DomainDaoSupport dao) {

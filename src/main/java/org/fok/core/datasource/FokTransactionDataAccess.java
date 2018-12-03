@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.felix.ipojo.annotations.Instantiate;
+import org.apache.felix.ipojo.annotations.Property;
 import org.apache.felix.ipojo.annotations.Provides;
-import org.fok.core.bean.BlockMessageBuffer;
+import org.apache.felix.ipojo.annotations.Validate;
 import org.fok.core.config.FokChainConfig;
+import org.fok.core.config.FokChainConfigKeys;
 import org.fok.core.dbapi.ODBException;
 import org.fok.core.dbapi.ODBSupport;
 import org.fok.core.model.Transaction.TransactionInfo;
@@ -22,6 +24,7 @@ import onight.tfw.ntrans.api.ActorService;
 import onight.tfw.ntrans.api.annotation.ActorRequire;
 import onight.tfw.ojpa.api.DomainDaoSupport;
 import onight.tfw.ojpa.api.annotations.StoreDAO;
+import onight.tfw.outils.conf.PropHelper;
 
 @NActorProvider
 @Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
@@ -31,16 +34,17 @@ import onight.tfw.ojpa.api.annotations.StoreDAO;
 public class FokTransactionDataAccess extends BaseDatabaseAccess {
 	@StoreDAO(target = daoProviderId, daoClass = FokDao.class)
 	ODBSupport dao;
-	
-	FokChainConfig chainConfig = new FokChainConfig();
+	@ActorRequire(name = "fok_chain_config", scope = "global")
+	FokChainConfig chainConfig;
 	protected Cache storage;
 	protected static CacheManager cacheManager = CacheManager.create("./conf/ehcache.xml");
+	PropHelper prop = new PropHelper(null);
 
 	@Override
 	public String[] getCmds() {
 		return new String[] { "TRXDAO" };
 	}
-	
+
 	@Override
 	public String getModule() {
 		return "CORE";
@@ -53,20 +57,24 @@ public class FokTransactionDataAccess extends BaseDatabaseAccess {
 	public ODBSupport getDao() {
 		return dao;
 	}
-	
+
 	public FokTransactionDataAccess() {
-		this.storage = new Cache("pendingqueue_" + chainConfig.getTransaction_message_cache_nameId(),
-				chainConfig.getTransaction_message_cache_size(), MemoryStoreEvictionPolicy.LRU, true,
-				"./pendingcache_" + chainConfig.getTransaction_message_cache_nameId(), true, 0, 0, true, 120,
-				null);
+		this.storage = new Cache(
+				"pendingqueue_"
+						+ prop.get(FokChainConfigKeys.transaction_message_cache_nameId_key, "transaction_cache"),
+				prop.get(FokChainConfigKeys.transaction_message_cache_size_key, 500), MemoryStoreEvictionPolicy.LRU,
+				true,
+				"./pendingcache_"
+						+ prop.get(FokChainConfigKeys.transaction_message_cache_nameId_key, "transaction_cache"),
+				true, 0, 0, true, 120, null);
 		cacheManager.addCache(this.storage);
 	}
 
 	public void saveTransaction(TransactionInfo transaction)
 			throws ODBException, InterruptedException, ExecutionException {
 
-		put(dao, transaction.getTxHash().toByteArray(), transaction.toByteArray());
-		Element element = new Element(transaction.getTxHash().toByteArray(), transaction.toByteArray());
+		put(dao, transaction.getHash().toByteArray(), transaction.toByteArray());
+		Element element = new Element(transaction.getHash().toByteArray(), transaction.toByteArray());
 		this.storage.put(element);
 	}
 
