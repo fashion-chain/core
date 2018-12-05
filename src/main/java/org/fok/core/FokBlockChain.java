@@ -137,6 +137,10 @@ public class FokBlockChain implements ActorService {
 	public BlockInfo getLastConnectedBlock() {
 		return maxConnectBlock;
 	}
+	
+	public long getLastConnectedBlockHeight() {
+		return maxConnectHeight;
+	}
 
 	public BlockInfo getLastStableBlock() {
 		return maxStableBlock;
@@ -321,6 +325,7 @@ public class FokBlockChain implements ActorService {
 
 				List<BlockMessage> childs = blockMessageBuffer.get(height + 1, false);
 				if (childs.size() > 0) {
+					oBlockMessageMark.getChildBlock().addAll(childs);
 					oBlockMessageMark.setMark(BlockMessageMarkEnum.APPLY_CHILD);
 				} else {
 					oBlockMessageMark.setMark(BlockMessageMarkEnum.DONE);
