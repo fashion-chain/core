@@ -59,7 +59,7 @@ public class FokBlockChain implements ActorService {
 	private BlockInfo maxConnectBlock = null;
 	private BlockInfo maxStableBlock = null;
 
-	public synchronized void startBlockChain() {
+	public synchronized void startBlockChain(String bcuid, String vAddress, String vName) {
 		try {
 			byte[] nodeAccountAddress = getNodeAccountAddress();
 			if (nodeAccountAddress == null) {
@@ -137,7 +137,7 @@ public class FokBlockChain implements ActorService {
 	public BlockInfo getLastConnectedBlock() {
 		return maxConnectBlock;
 	}
-	
+
 	public long getLastConnectedBlockHeight() {
 		return maxConnectHeight;
 	}

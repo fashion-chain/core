@@ -27,7 +27,6 @@ import onight.tfw.ojpa.api.annotations.StoreDAO;
 import onight.tfw.outils.conf.PropHelper;
 
 @NActorProvider
-@Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
 @Instantiate(name = "transaction_da")
 @Slf4j
 @Data
@@ -59,13 +58,9 @@ public class FokTransactionDataAccess extends BaseDatabaseAccess {
 	}
 
 	public FokTransactionDataAccess() {
-		this.storage = new Cache(
-				"pendingqueue_"
-						+ prop.get(FokChainConfigKeys.transaction_message_cache_nameId_key, "transaction_cache"),
+		this.storage = new Cache(prop.get(FokChainConfigKeys.transaction_message_cache_nameId_key, "transaction_cache"),
 				prop.get(FokChainConfigKeys.transaction_message_cache_size_key, 500), MemoryStoreEvictionPolicy.LRU,
-				true,
-				"./pendingcache_"
-						+ prop.get(FokChainConfigKeys.transaction_message_cache_nameId_key, "transaction_cache"),
+				true, "./" + prop.get(FokChainConfigKeys.transaction_message_cache_nameId_key, "transaction_cache"),
 				true, 0, 0, true, 120, null);
 		cacheManager.addCache(this.storage);
 	}

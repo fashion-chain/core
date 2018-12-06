@@ -4,17 +4,13 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.felix.ipojo.annotations.Instantiate;
-import org.apache.felix.ipojo.annotations.Provides;
-import org.apache.felix.ipojo.annotations.Validate;
 import org.fok.core.bean.BlockMessageBuffer;
-import org.fok.core.config.CommonConstant;
 import org.fok.core.config.FokChainConfig;
 import org.fok.core.config.FokChainConfigKeys;
 import org.fok.core.cryptoapi.ICryptoHandler;
 import org.fok.core.dbapi.ODBException;
 import org.fok.core.dbapi.ODBSupport;
 import org.fok.core.model.Block.BlockInfo;
-import org.fok.core.dbmodel.Entity.SecondaryValue;
 import org.fok.tools.bytes.BytesHashMap;
 import org.fok.tools.bytes.BytesHelper;
 
@@ -25,7 +21,6 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.store.MemoryStoreEvictionPolicy;
 import onight.osgi.annotation.NActorProvider;
-import onight.tfw.ntrans.api.ActorService;
 import onight.tfw.ntrans.api.annotation.ActorRequire;
 import onight.tfw.ojpa.api.DomainDaoSupport;
 import onight.tfw.ojpa.api.annotations.StoreDAO;
@@ -45,9 +40,10 @@ public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess {
 	PropHelper prop = new PropHelper(null);
 	@ActorRequire(name = "bc_crypto", scope = "global")
 	ICryptoHandler crypto;
-	
+
 	@ActorRequire(name = "common_da", scope = "global")
 	FokCommonDataAccess fokCommonDA;
+
 	@Override
 	public String[] getCmds() {
 		return new String[] { "BCDAO" };
@@ -73,12 +69,10 @@ public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess {
 
 	public FokBlockChainDataAccess() {
 		this.blockHashStorage = new Cache(
-				"pendingqueue_" + prop.get(FokChainConfigKeys.block_message_storage_cache_nameId_key, "block_cache")
-						+ "_hash",
+				prop.get(FokChainConfigKeys.block_message_storage_cache_nameId_key, "block_cache") + "_hash",
 				prop.get(FokChainConfigKeys.block_message_storage_cache_size_key, 100), MemoryStoreEvictionPolicy.LRU,
-				true,
-				"./pendingcache_" + prop.get(FokChainConfigKeys.block_message_storage_cache_nameId_key, "block_cache"),
-				true, 0, 0, true, 120, null);
+				true, "./" + prop.get(FokChainConfigKeys.block_message_storage_cache_nameId_key, "block_cache"), true,
+				0, 0, true, 120, null);
 		cacheManager.addCache(this.blockHashStorage);
 	}
 
@@ -99,11 +93,11 @@ public class FokBlockChainDataAccess extends SecondaryBaseDatabaseAccess {
 
 		byte[] v = get(dao, hash);
 		if (v != null) {
-			SecondaryValue oSV = SecondaryValue.parseFrom(v);
-			BlockInfo block = BlockInfo.parseFrom(oSV.getData());
+			BlockInfo block = BlockInfo.parseFrom(v);
 			this.blockHashStorage.put(new Element(block.getHeader().getHash().toByteArray(), block));
 			// TODO 不需要缓存根据高度查找Block的方法，因为没法判断缓存里是否包含完整的数据
-			// Element e = this.blockNumberStorage.get(block.getHeader().getHeight());
+			// Element e =
+			// this.blockNumberStorage.get(block.getHeader().getHeight());
 			// if (e == null) {
 			// List<BlockInfo> li = new ArrayList<BlockInfo>();
 			// li.add(block);
