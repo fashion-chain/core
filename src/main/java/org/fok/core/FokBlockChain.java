@@ -59,7 +59,7 @@ public class FokBlockChain implements ActorService {
 	private BlockInfo maxConnectBlock = null;
 	private BlockInfo maxStableBlock = null;
 
-	public synchronized void startBlockChain(String bcuid, String vAddress, String vName) {
+	public synchronized void startBlockChain(String vId, String vAddress, String vName) {
 		try {
 			byte[] nodeAccountAddress = getNodeAccountAddress();
 			if (nodeAccountAddress == null) {
@@ -122,13 +122,14 @@ public class FokBlockChain implements ActorService {
 					maxBlockHeight -= 1;
 				}
 			}
+			chainConfig.setNodeId(vId);
 			chainConfig.setNodeStart(true);
 			fokStateTrie.setRoot(maxConnectBlock.getHeader().getStateRoot().toByteArray());
 			log.debug(String.format("节点启动   ===>   设置最高块 hash[%s] 高度[%-10s] 状态树[{}]",
 					crypto.bytesToHexStr(maxConnectBlock.getHeader().getHash().toByteArray()),
 					maxConnectBlock.getHeader().getHeight(),
 					crypto.bytesToHexStr(maxConnectBlock.getHeader().getStateRoot().toByteArray())));
-			log.debug("节点启动   ===>   节点启动");
+			log.debug("节点启动   ===>   完成");
 		} catch (Exception e) {
 			log.error("节点启动异常", e);
 		}

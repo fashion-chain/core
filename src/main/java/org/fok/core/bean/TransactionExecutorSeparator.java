@@ -80,7 +80,7 @@ public class TransactionExecutorSeparator {
 					break;
 				}
 				if (bucketIdx < 0) {
-					TransactionInput input = tx.getBody().getInputs();
+					TransactionInput input = tx.getBody().getInput();
 					if (rs.sequances.containsKey(fastAddress(input.getAddress()))) {
 						bucketIdx = i;
 						break;
@@ -103,7 +103,7 @@ public class TransactionExecutorSeparator {
 			for (TransactionOutput output : tx.getBody().getOutputsList()) {
 				rs.sequances.put(fastAddress(output.getAddress()), tx);
 			}
-			rs.sequances.put(fastAddress(tx.getBody().getInputs().getAddress()), tx);
+			rs.sequances.put(fastAddress(tx.getBody().getInput().getAddress()), tx);
 			rs.queue.offer(tx);
 		}
 	}

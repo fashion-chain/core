@@ -3,6 +3,9 @@ package org.fok.core.handler;
 import java.math.BigInteger;
 import java.util.List;
 
+import org.apache.felix.ipojo.annotations.Instantiate;
+import org.apache.felix.ipojo.annotations.Provides;
+import org.fok.core.FokAccount;
 import org.fok.core.api.IAccountHandler;
 import org.fok.core.cryptoapi.ICryptoHandler;
 import org.fok.core.datasource.FokAccountDataAccess;
@@ -12,7 +15,7 @@ import org.fok.core.model.Account.AccountInfo;
 import org.fok.core.model.Account.AccountTokenValue;
 import org.fok.core.model.Account.AccountInfo.Builder;
 import org.fok.core.model.Account.AccountValue;
-import org.fok.core.model.Account.CryptoTokenValue;
+import org.fok.core.model.Account.CryptoTokenOriginValue;
 import org.fok.core.model.Account.TokenValue;
 import org.fok.core.trie.FokStorageTrie;
 import org.fok.core.trie.FokStorageTrieCache;
@@ -22,12 +25,28 @@ import org.fok.tools.bytes.BytesHelper;
 import com.google.protobuf.ByteString;
 
 import lombok.extern.slf4j.Slf4j;
+import onight.osgi.annotation.NActorProvider;
+import onight.tfw.ntrans.api.ActorService;
+import onight.tfw.ntrans.api.annotation.ActorRequire;
 
+@NActorProvider
+@Provides(specifications = { ActorService.class }, strategy = "SINGLETON")
+@Instantiate(name = "core_account_handler")
 @Slf4j
-public class AccountHandler implements IAccountHandler {
+public class AccountHandler implements IAccountHandler, ActorService {
+	@ActorRequire(name = "Storage_TrieCache", scope = "global")
 	private FokStorageTrieCache storageTrieCache;
+	@ActorRequire(name = "account_da", scope = "global")
 	private FokAccountDataAccess accountDA;
+	@ActorRequire(name = "bc_crypto", scope = "global")
 	private ICryptoHandler cryptoHandler;
+	@ActorRequire(name = "fok_account_core", scope = "global")
+	private FokAccount fokAccount;
+	
+	@Override
+	public AccountInfo.Builder getAccountOrCreate(ByteString address){
+		return fokAccount.getAccountOrCreate(address);
+	}
 
 	@Override
 	public BigInteger addBalance(Builder account, BigInteger amount) {
@@ -168,14 +187,14 @@ public class AccountHandler implements IAccountHandler {
 	}
 
 	@Override
-	public CryptoTokenValue getCryptoToken(Builder account, byte[] symbol) {
+	public CryptoTokenOriginValue getCryptoTokenOrigin(Builder account, byte[] symbol) {
 		byte[] ctvBytes = getAccountStorage(account, symbol);
 		if (ctvBytes == null) {
 			return null;
 		}
 		try {
-			CryptoTokenValue oCryptoTokenValue = CryptoTokenValue.parseFrom(ctvBytes);
-			return oCryptoTokenValue;
+			CryptoTokenOriginValue oCryptoTokenOriginValue = CryptoTokenOriginValue.parseFrom(ctvBytes);
+			return oCryptoTokenOriginValue;
 		} catch (Exception e) {
 			log.error(String.format("无法从账户[%s]中获取symbol名称为[%s]的crypto-token的发行信息",
 					cryptoHandler.bytesToHexStr(account.getAddress().toByteArray()),
@@ -260,6 +279,14 @@ public class AccountHandler implements IAccountHandler {
 		account.getValueBuilder().setNonce(account.getValue().getNonce() + 1);
 		return account.getValue().getNonce();
 	}
+	
+
+
+	@Override
+	public int setNonce(Builder account, int nonce) {
+		account.getValueBuilder().setNonce(nonce);
+		return account.getValue().getNonce();
+	}
 
 	@Override
 	public byte[] lockBalanceAddress() {
@@ -275,7 +302,7 @@ public class AccountHandler implements IAccountHandler {
 	}
 
 	@Override
-	public void putCryptoToken(Builder account, byte[] symbol, CryptoTokenValue oCryptoTokenValue) {
+	public void putCryptoTokenOrigin(Builder account, byte[] symbol, CryptoTokenOriginValue oCryptoTokenValue) {
 		putAccountStorage(account, symbol, oCryptoTokenValue.toByteArray());
 	}
 

@@ -10,6 +10,7 @@ public class FokChainConfigKeys {
 	public static final String account_storage_cache_size_key = "org.fok.core.account.storage.cache.size";
 
 	public static final String transaction_confirm_queue_cache_size_key = "org.fok.core.transaction.confirm.cache.size";
+	public static final String transaction_confirm_queue_cache_clear_ms = "org.fok.core.transaction.confirm.cache.clear.ms";
 	public static final String transaction_gas_address_key = "org.fok.core.transaction.gas.address";
 	public static final String transaction_message_queue_cache_nameId_key = "org.fok.core.transaction.message.queue.cache.name";
 	public static final String transaction_message_queue_cache_size_key = "org.fok.core.transaction.message.queue.cache.size";

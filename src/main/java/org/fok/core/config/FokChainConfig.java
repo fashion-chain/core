@@ -40,7 +40,7 @@ public class FokChainConfig extends SessionModules<Message> {
 	PropHelper prop = new PropHelper(null);
 
 	boolean isNodeStart = false;
-	String nodeName = "";
+	String nodeId = "";
 	byte[] nodeAddress;
 
 	public final int account_storage_cache_size = prop.get(FokChainConfigKeys.account_storage_cache_nameId_key, 200);
