@@ -134,6 +134,9 @@ public class FokBlockChain implements ActorService {
 			log.error("节点启动异常", e);
 		}
 	}
+	public BlockInfo getLastStableBlock() {
+		return maxStableBlock;
+	}
 
 	public BlockInfo getLastConnectedBlock() {
 		return maxConnectBlock;
@@ -143,9 +146,7 @@ public class FokBlockChain implements ActorService {
 		return maxConnectHeight;
 	}
 
-	public BlockInfo getLastStableBlock() {
-		return maxStableBlock;
-	}
+	
 
 	public BlockInfo getLastReceiveBlock() {
 		return maxReceiveBlock;
